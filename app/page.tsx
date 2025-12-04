@@ -1,21 +1,21 @@
 import { prisma } from "@/lib/prisma";
-import DashboardPageClient from "@/app/dashboard-client";
-
-export const dynamic = "force-dynamic";
+import DashboardPageClient from "./components/DashboardPageClient";
 
 export default async function DashboardPage() {
-  const links = await prisma.link.findMany({
-    orderBy: { createdAt: "desc" },
+  const linksData = await prisma.link.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      code: true,
+      url: true,
+      clickCount: true,
+      lastClicked: true,
+    },
   });
-
-  return (
-    <DashboardPageClient
-      initialLinks={links.map((l: any) => ({
-        code: l.code,
-        url: l.url,
-        clickCount: l.clickCount,
-        lastClicked: l.lastClicked ? l.lastClicked.toISOString() : null,
-      }))}
-    />
-  );
+  const links = linksData.map((link) => ({
+    ...link,
+    lastClicked: link.lastClicked ? link.lastClicked.toISOString() : null,
+  }));
+  return <DashboardPageClient initialLinks={links} />;
 }

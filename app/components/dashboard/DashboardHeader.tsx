@@ -34,26 +34,6 @@ export function DashboardHeader() {
               </p>
             </div>
           </div>
-
-          <a
-            href="/healthz"
-            className="group flex items-center gap-2 rounded-xl border border-gray-200/80 bg-white/80 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50/80 hover:text-emerald-700 hover:shadow-md"
-          >
-            <svg
-              className="h-4 w-4 text-emerald-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Health Status
-          </a>
         </div>
       </div>
     </nav>

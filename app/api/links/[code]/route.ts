@@ -1,42 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
-type Params = { 
-  params: Promise<{ code: string }> 
-};
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ code: string }> },
+) {
+  try {
+    const { code } = await params;
 
-export async function GET(_req: NextRequest, { params }: Params) {
-  const { code } = await params; // Add await here
-  
-  const link = await prisma.link.findUnique({
-    where: { code },
-  });
+    const existingLink = await prisma.link.findUnique({
+      where: { code },
+    });
 
-  if (!link) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!existingLink) {
+      return NextResponse.json({ error: "Link not found" }, { status: 404 });
+    }
+
+    await prisma.link.delete({
+      where: { code },
+    });
+
+    // Revalidate multiple paths if needed
+    revalidatePath("/");
+    revalidatePath("/[code]", "page");
+
+    return NextResponse.json({
+      success: true,
+      message: "Link deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting link:", error);
+    return NextResponse.json(
+      { error: "Failed to delete link" },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json(
-    {
-      code: link.code,
-      url: link.url,
-      clickCount: link.clickCount,
-      lastClicked: link.lastClicked,
-      createdAt: link.createdAt,
-    },
-    { status: 200 },
-  );
-}
-
-export async function DELETE(_req: NextRequest, { params }: Params) {
-  const { code } = await params; // Add await here
-  
-  const link = await prisma.link.findUnique({ where: { code } });
-  if (!link) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
-  await prisma.link.delete({ where: { code } });
-
-  return NextResponse.json({ ok: true }, { status: 200 });
 }
